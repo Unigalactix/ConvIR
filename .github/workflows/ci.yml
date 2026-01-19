@@ -18,6 +18,8 @@ jobs:
   # -------------------------------------------------
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
  
     steps:
       - name: Checkout source
@@ -85,6 +87,8 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     needs: [build, security-scan]
+    permissions:
+      contents: read
     outputs:
       repo_lower: ${{ steps.compute_repo.outputs.repo_lower }}
  
@@ -121,6 +125,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker-build
     environment: 'Production'
+    permissions:
+      contents: read
  
     steps:
       - name: Deploy to Azure Web App
