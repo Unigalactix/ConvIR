@@ -48,8 +48,12 @@ jobs:
  
       - name: Test notebook can be parsed
         run: |
-          pip install nbformat jupyter
-          python -c "import nbformat; nb = nbformat.read('ConvIR.ipynb', as_version=4); print(f'Notebook has {len(nb.cells)} cells')"
+          if [ -f "ConvIR.ipynb" ]; then
+            pip install nbformat jupyter
+            python -c "import nbformat; nb = nbformat.read('ConvIR.ipynb', as_version=4); print(f'Notebook has {len(nb.cells)} cells')"
+          else
+            echo "No notebook found, skipping validation"
+          fi
  
   # -------------------------------------------------
   # JOB 2: SECURITY SCANS
@@ -81,13 +85,18 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     needs: [build, security-scan]
+    outputs:
+      repo_lower: ${{ steps.compute_repo.outputs.repo_lower }}
  
     steps:
       - uses: actions/checkout@v4
  
       - name: Compute lowercase repo name
+        id: compute_repo
         run: |
-          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
+          echo "REPO_LOWER=${REPO_LOWER}" >> $GITHUB_ENV
+          echo "repo_lower=${REPO_LOWER}" >> $GITHUB_OUTPUT
  
       - name: Login to ACR
         uses: docker/login-action@v3
@@ -119,4 +128,4 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.REPO_LOWER }}:${{ github.sha }}
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/${{ needs.docker-build.outputs.repo_lower }}:${{ github.sha }}

@@ -9,8 +9,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt* ./
-RUN pip install --no-cache-dir torch torchvision numpy pillow scikit-image tensorboard
+RUN pip install --no-cache-dir \
+    torch==2.0.1 \
+    torchvision==0.15.2 \
+    numpy==1.24.3 \
+    pillow==10.0.0 \
+    scikit-image==0.21.0 \
+    tensorboard==2.13.0
 
 # Copy application code
 COPY . .
