@@ -116,6 +116,10 @@ jobs:
     environment: 'Production'
  
     steps:
+      - name: Compute lowercase repo name
+        run: |
+          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+ 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:

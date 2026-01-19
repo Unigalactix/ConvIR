@@ -8,8 +8,7 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY ConvIR.ipynb ./
+# Install Python dependencies
 RUN pip install --no-cache-dir \
     torch>=1.8.0 \
     torchvision>=0.9.0 \
@@ -20,7 +19,7 @@ RUN pip install --no-cache-dir \
     jupyter \
     notebook
 
-# Copy the rest of the application
+# Copy the application
 COPY . .
 
 # Expose Jupyter port
